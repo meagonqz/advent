@@ -3,19 +3,21 @@ defmodule AdventOfCode.Day01Test do
 
   import AdventOfCode.Day01
 
-  @tag :skip
-  test "part1" do
-    input = nil
-    result = part1(input)
-
-    assert result
+  test "initial_fuel" do
+    input = [12, 14, 1969, 100_756]
+    assert Enum.map(input, &initial_fuel/1) == [2, 2, 654, 33583]
   end
 
-  @tag :skip
-  test "part2" do
-    input = nil
-    result = part2(input)
+  test "part1" do
+    assert part1() == 3_327_415
+  end
 
-    assert result
+  test "fuel_required" do
+    input = [14, 1969, 100_756]
+    assert Enum.map(input, &fuel_required/1) == [2, 966, 50346]
+  end
+
+  test "part2" do
+    assert part2() == 4_988_257
   end
 end
