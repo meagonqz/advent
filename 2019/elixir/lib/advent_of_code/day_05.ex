@@ -1,27 +1,32 @@
 defmodule AdventOfCode.Day05 do
   require Integer
-  @opcode_length 2
-  @initial_input 1
+  @first_input 1
+  @second_input 5
 
-  def process_sequence(input) do
-    process(input, 0)
+  def process_sequence(input, first) do
+    process(input, 0, first)
   end
 
   def peek_opcode(opcode) do
     List.last(opcode)
   end
 
-  def process(input, index) do
+  def process(input, index, first \\ @first_input) do
     opcode = Enum.at(input, index)
     op = peek_opcode(Integer.digits(opcode))
-    process_opcode(op, input, index)
+
+    if(op === 3) do
+      process_opcode(op, input, index, first)
+    else
+      process_opcode(op, input, index)
+    end
   end
 
   # input, 3, 50 -> takes input value and stores it at 50
-  def process_opcode(3, input, index) do
+  def process_opcode(3, input, index, initial) do
     opcode_length = 2
     [3, address] = Enum.take(input, opcode_length)
-    process(List.replace_at(input, address, @initial_input), index + opcode_length)
+    process(List.replace_at(input, address, initial), index + opcode_length)
   end
 
   def process_opcode(4, input, index) do
@@ -49,6 +54,71 @@ defmodule AdventOfCode.Day05 do
     padded = pad_digit_values(one)
     input = process_by_mode(padded, [i, i2, result], input, &Kernel.*/2)
     process(input, index + opcode_length)
+  end
+
+  # input [5, 6, 7] jump instructions to value if 6 is non-zero
+  def process_opcode(5, input, index) do
+    opcode_length = 3
+    [five, i, i2] = Enum.slice(input, index..(index + opcode_length - 1))
+    [input_2_mode, input_1_mode, 0, 5] = pad_digit_values(five, 4)
+    value = get_value(i, input_1_mode, input)
+    value2 = get_value(i2, input_2_mode, input)
+
+    if value != 0 do
+      process(input, value2)
+    else
+      process(input, index + opcode_length)
+    end
+  end
+
+  # jump instructions to value if i is zero
+  def process_opcode(6, input, index) do
+    opcode_length = 3
+    [six, i, i2] = Enum.slice(input, index..(index + opcode_length - 1))
+    [input_2_mode, input_1_mode, 0, 6] = pad_digit_values(six, 4)
+    value = get_value(i, input_1_mode, input)
+    value2 = get_value(i2, input_2_mode, input)
+
+    if value == 0 do
+      process(input, value2)
+    else
+      process(input, index + opcode_length)
+    end
+  end
+
+  # input [7, 8, 9, 10] if 8 is less than 9, store 1 in 10
+  def process_opcode(7, input, index) do
+    opcode_length = 4
+    [seven, i, i2, result] = Enum.slice(input, index..(index + opcode_length - 1))
+    [result_mode, input_2_mode, input_1_mode, 0, 7] = pad_digit_values(seven)
+    value = get_value(i, input_1_mode, input)
+    value2 = get_value(i2, input_2_mode, input)
+    result_value = get_value(result, result_mode, input)
+
+    if(value < value2) do
+      input = List.replace_at(input, result, 1)
+      process(input, index + opcode_length)
+    else
+      input = List.replace_at(input, result, 0)
+      process(input, index + opcode_length)
+    end
+  end
+
+  def process_opcode(8, input, index) do
+    opcode_length = 4
+    [eight, i, i2, result] = Enum.slice(input, index..(index + opcode_length - 1))
+    [result_mode, input_2_mode, input_1_mode, 0, 8] = pad_digit_values(eight)
+    value = get_value(i, input_1_mode, input)
+    value2 = get_value(i2, input_2_mode, input)
+    result_value = get_value(result, result_mode, input)
+
+    if(value == value2) do
+      input = List.replace_at(input, result, 1)
+      process(input, index + opcode_length)
+    else
+      input = List.replace_at(input, result, 0)
+      process(input, index + opcode_length)
+    end
   end
 
   def process_opcode(9, input, index) do
@@ -100,9 +170,15 @@ defmodule AdventOfCode.Day05 do
     |> String.trim()
     |> String.split(",", trim: true)
     |> Enum.map(&String.to_integer/1)
-    |> process_sequence()
+    |> process_sequence(@first_input)
   end
 
   def part2() do
+    "assets/day05_input.txt"
+    |> AdventOfCode.read_file()
+    |> String.trim()
+    |> String.split(",", trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> process_sequence(@second_input)
   end
 end

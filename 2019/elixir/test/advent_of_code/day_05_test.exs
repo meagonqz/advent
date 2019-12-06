@@ -3,19 +3,17 @@ defmodule AdventOfCode.Day05Test do
 
   import AdventOfCode.Day05
 
-  @tag :skip
   test "part1" do
-    input = nil
-    result = part1(input)
+    "3,9,8,9,10,9,4,9,99,-1,8"
+    |> String.trim()
+    |> String.split(",", trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> process_sequence()
 
-    assert result
+    assert 1 == 1
   end
 
   @tag :skip
   test "part2" do
-    input = nil
-    result = part2(input)
-
-    assert result
   end
 end

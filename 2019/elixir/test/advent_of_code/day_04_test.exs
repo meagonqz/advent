@@ -5,16 +5,14 @@ defmodule AdventOfCode.Day04Test do
 
   @tag :skip
   test "part1" do
-    input = nil
-    result = part1(input)
+    result = part1()
 
     assert result
   end
 
   @tag :skip
   test "part2" do
-    input = nil
-    result = part2(input)
+    result = part2()
 
     assert result
   end
