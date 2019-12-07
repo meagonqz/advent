@@ -59,18 +59,44 @@ K)L"
     |> Enum.sum()
   end
 
+  def traverse(_map, nil, _visited, _last) do
+    []
+  end
+
+  def traverse(_map, last, visited, last) do
+    visited
+  end
+
+  def traverse(map, current, visited, last) do
+    next = Map.get(map, current)
+    Enum.map(next, &traverse(map, &1, [&1 | visited], last))
+  end
+
   def produce_reverse_map(inputs) do
     inputs
-    |> Enum.reduce(Map.new(), &set_in_map(&2, &1))
+    |> Enum.reduce(Map.new(), &set_in_map(Enum.reverse(&1), &2))
   end
 
   def part2() do
-    "assets/day06_input.txt"
-    |> AdventOfCode.read_file()
-    |> String.split("\n", trim: true)
-    |> Enum.map(&String.split(&1, ")", trim: true))
-    |> produce_reverse_map()
+    map =
+      "assets/day06_input.txt"
+      |> AdventOfCode.read_file()
+      |> String.split("\n", trim: true)
+      |> Enum.map(&String.split(&1, ")", trim: true))
+      |> produce_reverse_map()
 
-    # Todo: paths up to COM from me, paths up to COM from santa, find common path
+    my_path_to_root =
+      map
+      |> traverse("YOU", [], "COM")
+      |> List.flatten()
+
+    santa_path_to_root =
+      map
+      |> traverse("SAN", [], "COM")
+      |> List.flatten()
+
+    my_path_to_common_ancestor = my_path_to_root -- santa_path_to_root
+    san_path_to_common_ancestor = santa_path_to_root -- my_path_to_root
+    IO.inspect((my_path_to_common_ancestor ++ san_path_to_common_ancestor) |> length())
   end
 end
