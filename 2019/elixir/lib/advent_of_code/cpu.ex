@@ -156,25 +156,15 @@ defmodule AdventOfCode.CPU do
     end
   end
 
-  def process_opcode(9, %CPU{memory: memory, index: index, output: output} = cpu) do
-    opcode_length = 2
+  def process_opcode(9, %CPU{} = cpu) do
     {:ok, %CPU{cpu | state: :halted}}
   end
-
-  def boolean_to_integer(true), do: 1
-  def boolean_to_integer(false), do: 0
 
   def pad_digit_values(value, padding \\ 5) do
     digits = Integer.digits(value)
     len = length(digits)
     padding = [0] |> Stream.cycle() |> Enum.take(padding - len)
     padding ++ digits
-  end
-
-  def pad_value(value, params \\ 5) do
-    len = length(value)
-    padding = [0] |> Stream.cycle() |> Enum.take(params - len)
-    padding ++ value
   end
 
   def process_by_mode(
