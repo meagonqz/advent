@@ -3,19 +3,19 @@ defmodule AdventOfCode.Day05 do
   @first_input 1
   @second_input 5
 
-  def process_sequence(input, first, return_at_output \\ false) do
-    process(input, 0, first, return_at_output)
+  def process_sequence(input, first, return_opts \\ %{return_at_output: false, downstream: nil}) do
+    process(input, 0, first, return_opts)
   end
 
   def peek_opcode(opcode) do
     List.last(opcode)
   end
 
-  def process(input, index, inputs, return_at_output) do
+  def process(input, index, inputs, return_opts) do
     opcode = Enum.at(input, index)
     op = peek_opcode(Integer.digits(opcode))
 
-    process_opcode(op, input, index, inputs, return_at_output)
+    process_opcode(op, input, index, inputs, return_opts)
   end
 
   # input, 3, 50 -> takes input value and stores it at 50
@@ -31,8 +31,13 @@ defmodule AdventOfCode.Day05 do
     [mode, _zero, 4] = pad_digit_values(four, 3)
     value = get_value(address, mode, input)
 
-    if return do
-      value
+    if return.return_at_output do
+      if return.downstream do
+        send(return.downstream, value)
+        input
+      else
+        value
+      end
     else
       IO.inspect(return, label: "Output")
       process(input, index + opcode_length, inputs, return)
